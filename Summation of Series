@@ -1,0 +1,44 @@
+//Method 1
+#include <stdio.h>
+#include <math.h>
+double sumg(double x, int n) {
+    if (x == 1.0) {
+        return n + 1;
+    }
+    return (pow(x, n + 1) - 1) / (x - 1);
+}
+int main() {
+    double x;
+    int n;
+    printf("Enter X: ");
+    scanf("%lf", &x);
+    printf("Enter n: ");
+    scanf("%d", &n);
+    double result = sumg(x, n);
+    printf("Sum: %lf\n", result);
+    return 0;
+}
+
+//Method 2
+#include <stdio.h>
+double sumg(double x, int n) {
+    double a= 1.0;  
+    double r= 1.0;
+    for (int i = 1; i <= n; i++) {
+        r*= x;     
+        a+=r;  
+    }
+    return a;      
+}
+
+int main() {
+    double x;
+    int n;
+    printf("Enter X: ");
+    scanf("%lf", &x);
+    printf("Enter n: ");
+    scanf("%d", &n);
+    double result = sumg(x, n);
+    printf("Sum is: %lf\n", result);
+    return 0;
+}
