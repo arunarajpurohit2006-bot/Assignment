@@ -1,0 +1,90 @@
+#include <stdio.h>
+#define MAX 100
+typedef struct stack {
+    int arr[MAX];
+    int top;
+} stack;
+void init(stack *sp) {
+    sp->top = -1;
+}
+int isfull(stack *sp) {
+    return (sp->top == MAX - 1);
+}
+int isempty(stack *sp) {
+    return (sp->top == -1);
+}
+void push(stack *sp, int x) {
+    if (isfull(sp)) {
+        printf("Stack Overflow\n");
+    } else {
+        sp->top++;
+        sp->arr[sp->top] = x;
+    }
+}
+int pop(stack *sp) {
+    if (isempty(sp)) {
+        return -1;  // return -1 if empty
+    } else {
+        return sp->arr[sp->top--];
+    }
+}
+int peek(stack *sp) {
+    if (isempty(sp)) {
+        return -1;
+    }
+    return sp->arr[sp->top];
+}
+void moveDisksBetweenTwoPoles(stack *src, stack *dest, char s, char d) {
+    int pole1Top = pop(src);
+    int pole2Top = pop(dest);
+    if (pole1Top == -1) {
+        push(src, pole2Top);
+        printf("Move disk %d from %c to %c\n", pole2Top, d, s);
+    }
+    else if (pole2Top == -1) {
+        push(dest, pole1Top);
+        printf("Move disk %d from %c to %c\n", pole1Top, s, d);
+    }
+    else if (pole1Top > pole2Top) {
+        push(src, pole1Top);
+        push(src, pole2Top);
+        printf("Move disk %d from %c to %c\n", pole2Top, d, s);
+    }
+    else {
+        push(dest, pole2Top);
+        push(dest, pole1Top);
+        printf("Move disk %d from %c to %c\n", pole1Top, s, d);
+    }
+}
+void towerOfHanoiIterative(int n, stack *src, stack *aux, stack *dest) {
+    int i, totalMoves;
+    char s = 'A', d = 'C', a = 'B';
+    if (n % 2 == 0) {
+        char temp = d;
+        d = a;
+        a = temp;
+    }
+    totalMoves = (1 << n) - 1;
+    for (i = n; i >= 1; i--) {
+        push(src, i);
+    }
+    for (i = 1; i <= totalMoves; i++) {
+        if (i % 3 == 1)
+            moveDisksBetweenTwoPoles(src, dest, s, d);
+        else if (i % 3 == 2)
+            moveDisksBetweenTwoPoles(src, aux, s, a);
+        else if (i % 3 == 0)
+            moveDisksBetweenTwoPoles(aux, dest, a, d);
+    }
+}
+int main() {
+    int n;
+    printf("Enter number of disks: ");
+    scanf("%d", &n);
+    stack src, aux, dest;
+    init(&src);
+    init(&aux);
+    init(&dest);
+    towerOfHanoiIterative(n, &src, &aux, &dest);
+    return 0;
+}
