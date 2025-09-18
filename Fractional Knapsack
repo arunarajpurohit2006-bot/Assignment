@@ -1,0 +1,66 @@
+#include <stdio.h>
+struct Item {
+    int profit;
+    int weight;
+};
+void sortByProfit(struct Item arr[], int n) {
+    for (int i=0; i<n-1; i++)
+        for (int j=0; j<n-i-1; j++)
+            if (arr[j].profit < arr[j+1].profit) {
+                struct Item temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+}
+void sortByWeight(struct Item arr[], int n) {
+    for (int i=0; i<n-1; i++)
+        for (int j=0; j<n-i-1; j++)
+            if (arr[j].weight > arr[j+1].weight) {
+                struct Item temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+}
+void sortByRatio(struct Item arr[], int n) {
+    for (int i=0; i<n-1; i++)
+        for (int j=0; j<n-i-1; j++) {
+            double r1 = (double)arr[j].profit / arr[j].weight;
+            double r2 = (double)arr[j+1].profit / arr[j+1].weight;
+            if (r1 < r2) {
+                struct Item temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+}
+double fractionalKnapsack(int capacity, struct Item arr[], int n, int method) {
+    if (method == 1) sortByProfit(arr, n);
+    else if (method == 2) sortByWeight(arr, n);
+    else sortByRatio(arr, n);
+    double totalProfit = 0.0;
+    for (int i=0; i<n; i++) {
+        if (capacity >= arr[i].weight) {
+            capacity -= arr[i].weight;
+            totalProfit += arr[i].profit;
+        } else {
+            totalProfit += arr[i].profit * ((double)capacity / arr[i].weight);
+            break;
+        }
+    }
+    return totalProfit;
+}
+int main() {
+    int capacity = 40;
+    struct Item arr[] = {{12,30}, {20,195}, {3,19} , {15,48}};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    struct Item arr1[n], arr2[n], arr3[n];
+    for (int i=0; i<n; i++) {
+        arr1[i] = arr[i];
+        arr2[i] = arr[i];
+        arr3[i] = arr[i];
+    }
+    printf("Method 1: %.2f\n", fractionalKnapsack(capacity, arr1, n, 1));
+    printf("Method 2: %.2f\n", fractionalKnapsack(capacity, arr2, n, 2));
+    printf("Method 3: %.2f\n", fractionalKnapsack(capacity, arr3, n, 3));
+    return 0;
+}
