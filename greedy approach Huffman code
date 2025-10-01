@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    char c;
+    int f;
+    struct Node *l, *r;
+};
+
+struct MinHeap {
+    int size;
+    int cap;
+    struct Node** arr;
+};
+
+struct Node* newNode(char c, int f) {
+    struct Node* n = (struct Node*)malloc(sizeof(struct Node));
+    n->c = c; n->f = f;
+    n->l = n->r = NULL;
+    return n;
+}
+
+struct MinHeap* createHeap(int cap) {
+    struct MinHeap* h = (struct MinHeap*)malloc(sizeof(struct MinHeap));
+    h->size = 0; h->cap = cap;
+    h->arr = (struct Node**)malloc(cap * sizeof(struct Node*));
+    return h;
+}
+
+void swap(struct Node** a, struct Node** b) {
+    struct Node* t = *a; *a = *b; *b = t;
+}
+
+void heapify(struct MinHeap* h, int i) {
+    int small = i, l = 2*i+1, r = 2*i+2;
+    if (l<h->size && h->arr[l]->f < h->arr[small]->f) small = l;
+    if (r<h->size && h->arr[r]->f < h->arr[small]->f) small = r;
+    if (small!=i) { swap(&h->arr[i], &h->arr[small]); heapify(h, small); }
+}
+
+struct Node* extractMin(struct MinHeap* h) {
+    struct Node* t = h->arr[0];
+    h->arr[0] = h->arr[h->size-1];
+    h->size--;
+    heapify(h,0);
+    return t;
+}
+
+void insertHeap(struct MinHeap* h, struct Node* n) {
+    h->size++;
+    int i = h->size-1;
+    while(i && n->f < h->arr[(i-1)/2]->f) { h->arr[i] = h->arr[(i-1)/2]; i=(i-1)/2; }
+    h->arr[i] = n;
+}
+
+void buildHeap(struct MinHeap* h) { for(int i=h->size/2-1;i>=0;i--) heapify(h,i); }
+
+void printCodes(struct Node* r, int arr[], int t) {
+    if(r->l) { arr[t]=0; printCodes(r->l,arr,t+1);}
+    if(r->r) { arr[t]=1; printCodes(r->r,arr,t+1);}
+    if(!r->l && !r->r){ printf("%c: ",r->c); for(int i=0;i<t;i++) printf("%d",arr[i]); printf("\n"); }
+}
+
+struct Node* buildHuffman(char d[], int f[], int n){
+    struct MinHeap* h = createHeap(n);
+    for(int i=0;i<n;i++) h->arr[i]=newNode(d[i],f[i]);
+    h->size = n; buildHeap(h);
+    while(h->size>1){
+        struct Node* l=extractMin(h);
+        struct Node* r=extractMin(h);
+        struct Node* p=newNode('$',l->f+r->f);
+        p->l=l; p->r=r;
+        insertHeap(h,p);
+    }
+    return extractMin(h);
+}
+
+int main(){
+    char d[]={'a','b','c','d','e','f'};
+    int f[]={6,18,19,25,32,47};
+    int n=sizeof(d)/sizeof(d[0]);
+    struct Node* r=buildHuffman(d,f,n);
+    int arr[100]; printCodes(r,arr,0);
+    return 0;
+}
